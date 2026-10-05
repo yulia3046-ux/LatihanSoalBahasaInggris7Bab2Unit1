@@ -1,0 +1,1627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Grade 7 - Tastes of Delight Assessment Game</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            purple: '#6C5CE7',
+                            pink: '#FD79A8',
+                            yellow: '#FFEAA7',
+                            green: '#00B894',
+                            orange: '#E17055',
+                            blue: '#0984E3',
+                            dark: '#2D3436',
+                            light: '#F8F9FA'
+                        }
+                    },
+                    boxShadow: {
+                        'fun': '0 8px 0px 0px rgba(0, 0, 0, 0.15)',
+                        'fun-sm': '0 4px 0px 0px rgba(0, 0, 0, 0.15)',
+                        'fun-lg': '0 12px 0px 0px rgba(0, 0, 0, 0.15)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #F3F4F6;
+            background-image: radial-gradient(#6C5CE7 0.75px, transparent 0.75px), radial-gradient(#FD79A8 0.75px, #F3F4F6 0.75px);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+            user-select: none;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        @keyframes bounce-gentle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+        .animate-bounce-gentle {
+            animation: bounce-gentle 2s infinite ease-in-out;
+        }
+
+        .pulse-red {
+            animation: pulse-red-anim 1s infinite alternate;
+        }
+        @keyframes pulse-red-anim {
+            0% { background-color: #ef4444; color: #ffffff; }
+            100% { background-color: #fee2e2; color: #dc2626; }
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col justify-between antialiased selection:bg-purple-300 selection:text-purple-900">
+
+    <script>
+        /********************************************************************************
+         * TEACHER CONFIGURATION SECTION
+         * Insert your Google Apps Script Web App URL below between the single quotes.
+         * Example: const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx.../exec";
+         ********************************************************************************/
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxLzjqsuJVjG-iU3EcN_zd_tbOc4P1ERYzbmsFI0uhyCTeS31_Rv_lbnvpTzOFPyhh8/exec"; // <-- PASTE YOUR GOOGLE APPS SCRIPT URL HERE!
+        
+        // Passcode configuration
+        const SYSTEM_PASSCODE = "SMP2026";
+    </script>
+
+    <!-- Navigation Header -->
+    <header class="bg-white border-b-4 border-slate-900 sticky top-0 z-30 px-4 py-3 shadow-md">
+        <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-brand-purple flex items-center justify-center text-white text-xl font-black shadow-fun-sm border-2 border-slate-900">
+                    <i class="fa-solid fa-utensils"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg md:text-xl font-black tracking-wide text-slate-800 leading-tight">ENGLISH FUN TEST</h1>
+                    <p class="text-xs font-bold text-brand-purple">Fase D Grade 7 • Tastes of Delight</p>
+                </div>
+            </div>
+
+            <!-- Quiz Timer & Status (Visible only during exam) -->
+            <div id="header-status-bar" class="hidden flex items-center gap-3">
+                <div class="bg-amber-100 border-2 border-slate-900 rounded-xl px-3 py-1.5 flex items-center space-x-2 shadow-fun-sm">
+                    <i class="fa-solid fa-clock text-amber-600 text-lg"></i>
+                    <div>
+                        <span class="text-[10px] uppercase font-black text-amber-700 block -mb-1">Time Left</span>
+                        <span id="timer-display" class="font-black text-base md:text-lg text-slate-800">60:00</span>
+                    </div>
+                </div>
+
+                <!-- Cheating Counter Header -->
+                <div id="violation-badge" class="bg-red-100 border-2 border-slate-900 rounded-xl px-3 py-1.5 flex items-center space-x-2 shadow-fun-sm">
+                    <i class="fa-solid fa-triangle-exclamation text-red-600 text-lg"></i>
+                    <div>
+                        <span class="text-[10px] uppercase font-black text-red-700 block -mb-1">Violations</span>
+                        <span id="header-violation-count" class="font-black text-base text-red-600">0 / 3</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teacher Script Guide Button -->
+            <button onclick="openTeacherModal()" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-800 border-2 border-slate-900 font-bold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition shadow-fun-sm">
+                <i class="fa-solid fa-code text-indigo-600"></i>
+                <span>GAS Guide for Teacher</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl mx-auto w-full p-4 flex-grow flex flex-col justify-center my-4">
+
+        <!-- ================= SCREEN 1: LOGIN / START SCREEN ================= -->
+        <div id="screen-welcome" class="max-w-2xl mx-auto w-full bg-white border-4 border-slate-900 rounded-3xl p-6 md:p-8 shadow-fun-lg relative overflow-hidden">
+            <!-- Decorative Banner elements -->
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-brand-yellow rounded-full border-4 border-slate-900 -z-0"></div>
+            <div class="absolute -bottom-10 -left-10 w-28 h-28 bg-brand-pink rounded-full border-4 border-slate-900 -z-0"></div>
+
+            <div class="relative z-10">
+                <div class="text-center mb-6">
+                    <span class="inline-block px-4 py-1.5 bg-brand-yellow border-2 border-slate-900 rounded-full text-xs font-black uppercase tracking-wider text-slate-900 shadow-fun-sm mb-3">
+                        <i class="fa-solid fa-star mr-1"></i> Formative Assessment Unit 1
+                    </span>
+                    <h2 class="text-2xl md:text-4xl font-extrabold text-slate-800 tracking-tight">Welcome, Young Linguist! 🍔</h2>
+                    <p class="text-sm md:text-base text-slate-600 font-medium mt-1">Unit 1: My Favorite Food & Drinks (30 Questions)</p>
+                </div>
+
+                <!-- Guidelines Card -->
+                <div class="bg-blue-50 border-2 border-slate-900 rounded-2xl p-4 mb-6 shadow-fun-sm text-xs md:text-sm text-slate-700">
+                    <h3 class="font-black text-slate-900 uppercase tracking-wide flex items-center gap-2 mb-2">
+                        <i class="fa-solid fa-circle-info text-brand-blue"></i> Rules & Guidelines:
+                    </h3>
+                    <ul class="space-y-1.5 list-disc list-inside font-medium text-slate-700">
+                        <li>Total Duration: <span class="font-bold text-slate-900">60 Minutes</span>.</li>
+                        <li>Question Count: <span class="font-bold text-slate-900">30 Questions</span> (Multiple Choice).</li>
+                        <li><span class="font-bold text-red-600"><i class="fa-solid fa-shield-cat"></i> Anti-Cheating Active:</span> Leaving this tab/window is tracked. Maximum <span class="font-bold text-red-600">3 violations</span> will reset your session.</li>
+                    </ul>
+                </div>
+
+                <!-- Registration Form -->
+                <form id="login-form" onsubmit="handleStartExam(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-extrabold text-slate-700 uppercase mb-1">Student Full Name <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+                                <i class="fa-solid fa-user"></i>
+                            </span>
+                            <input type="text" id="input-student-name" required placeholder="e.g. Ahmad Rizky" 
+                                class="w-full pl-10 pr-4 py-3 bg-slate-50 border-2 border-slate-900 rounded-xl font-bold text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-purple-200 transition">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-extrabold text-slate-700 uppercase mb-1">Class / Grade <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-school"></i>
+                                </span>
+                                <select id="input-student-class" required class="w-full pl-10 pr-4 py-3 bg-slate-50 border-2 border-slate-900 rounded-xl font-bold text-slate-800 focus:outline-none focus:ring-4 focus:ring-purple-200 transition">
+                                    <option value="" disabled selected>Select Class...</option>
+                                    <option value="Class 7A">Class 7A</option>
+                                    <option value="Class 7B">Class 7B</option>
+                                    <option value="Class 7C">Class 7C</option>
+                                    <option value="Class 7D">Class 7D</option>
+                                    <option value="Class 7E">Class 7E</option>
+                                    <option value="Class 7F">Class 7F</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-extrabold text-slate-700 uppercase mb-1">Assessment Passcode <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-key"></i>
+                                </span>
+                                <input type="password" id="input-passcode" required placeholder="Enter Passcode..." 
+                                    class="w-full pl-10 pr-10 py-3 bg-slate-50 border-2 border-slate-900 rounded-xl font-bold text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-purple-200 transition">
+                                <button type="button" onclick="togglePasscodeVisibility()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-800">
+                                    <i id="passcode-eye-icon" class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="login-error-msg" class="hidden p-3 bg-red-100 border-2 border-red-500 rounded-xl text-red-700 text-xs font-bold text-center">
+                        <i class="fa-solid fa-circle-exclamation mr-1"></i> Incorrect Passcode! Please ask your teacher.
+                    </div>
+
+                    <button type="submit" class="w-full py-4 bg-brand-green hover:bg-emerald-500 text-white font-black text-lg border-4 border-slate-900 rounded-2xl shadow-fun transition transform active:translate-y-1 active:shadow-none flex items-center justify-center gap-2">
+                        <span>START ASSESSMENT</span>
+                        <i class="fa-solid fa-circle-play"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+
+        <!-- ================= SCREEN 2: EXAM SCREEN ================= -->
+        <div id="screen-exam" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- Left Side / Main Quiz Area (8 cols) -->
+            <div class="lg:col-span-8 space-y-4">
+                
+                <!-- Main Card -->
+                <div class="bg-white border-4 border-slate-900 rounded-3xl p-5 md:p-7 shadow-fun-lg relative">
+                    
+                    <!-- Question Header & Badges -->
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b-2 border-slate-200 pb-3 mb-4">
+                        <div class="flex items-center gap-2">
+                            <span id="question-number-badge" class="px-3 py-1 bg-brand-purple text-white font-black rounded-xl text-sm border-2 border-slate-900 shadow-fun-sm">
+                                Q #1
+                            </span>
+                            <span id="question-level-badge" class="px-2.5 py-1 bg-emerald-100 text-emerald-800 border-2 border-emerald-800 font-bold rounded-xl text-xs">
+                                Easy
+                            </span>
+                            <span id="question-topic-badge" class="hidden md:inline-block px-2.5 py-1 bg-slate-100 text-slate-700 border-2 border-slate-800 font-bold rounded-xl text-xs">
+                                Likes & Dislikes
+                            </span>
+                        </div>
+
+                        <!-- Mark for Review Checkbox Button -->
+                        <button type="button" id="btn-toggle-doubt" onclick="toggleDoubtState()" class="px-3 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold border-2 border-slate-900 rounded-xl text-xs flex items-center gap-1.5 transition">
+                            <i id="doubt-icon" class="fa-regular fa-bookmark text-amber-700"></i>
+                            <span id="doubt-text">Mark for Review</span>
+                        </button>
+                    </div>
+
+                    <!-- Question Content Area -->
+                    <div id="question-box" class="space-y-4">
+                        <!-- Reading Passage / Dialogue Box -->
+                        <div id="passage-container" class="bg-slate-50 border-2 border-slate-900 rounded-2xl p-4 text-slate-800 text-sm md:text-base leading-relaxed font-medium relative">
+                            <span class="absolute -top-3 left-4 bg-brand-pink text-white border-2 border-slate-900 px-2 py-0.5 rounded-md text-[10px] font-black uppercase">
+                                Passage / Context
+                            </span>
+                            <div id="passage-text" class="mt-1 whitespace-pre-line font-medium">Loading text...</div>
+                        </div>
+
+                        <!-- Optional Question Image Placeholder -->
+                        <div id="question-image-box" class="hidden my-3 text-center">
+                            <img id="question-image" src="" alt="Question Image" class="max-h-60 mx-auto rounded-xl border-2 border-slate-900 shadow-fun-sm object-cover" onerror="this.classList.add('hidden')">
+                        </div>
+
+                        <!-- Question Prompt -->
+                        <p id="question-prompt" class="font-extrabold text-base md:text-lg text-slate-900 pt-1">
+                            Question text here?
+                        </p>
+
+                        <!-- Answer Options Grid -->
+                        <div id="options-container" class="space-y-3 pt-2">
+                            <!-- Dynamically populated options A, B, C, D -->
+                        </div>
+                    </div>
+
+                    <!-- Footer Navigation Controls -->
+                    <div class="flex items-center justify-between gap-2 border-t-2 border-slate-200 pt-5 mt-6">
+                        <button id="btn-prev" onclick="goToPrevQuestion()" class="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-extrabold rounded-xl border-2 border-slate-900 shadow-fun-sm text-sm flex items-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i class="fa-solid fa-arrow-left"></i>
+                            <span>Previous</span>
+                        </button>
+
+                        <button id="btn-next" onclick="goToNextQuestion()" class="px-5 py-2.5 bg-brand-purple hover:bg-indigo-600 text-white font-extrabold rounded-xl border-2 border-slate-900 shadow-fun-sm text-sm flex items-center gap-2 transition">
+                            <span>Next</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+
+                        <button id="btn-finish-exam" onclick="confirmSubmitExam()" class="hidden px-5 py-2.5 bg-brand-green hover:bg-emerald-600 text-white font-extrabold rounded-xl border-2 border-slate-900 shadow-fun-sm text-sm flex items-center gap-2 transition">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            <span>Submit All</span>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Right Side / Question Palette Grid (4 cols) -->
+            <div class="lg:col-span-4 space-y-4">
+                <div class="bg-white border-4 border-slate-900 rounded-3xl p-5 shadow-fun-lg">
+                    <h3 class="font-black text-slate-800 text-base mb-3 flex items-center justify-between">
+                        <span><i class="fa-solid fa-grip mr-1 text-brand-purple"></i> Question Palette</span>
+                        <span id="answered-count-badge" class="text-xs bg-purple-100 text-purple-800 px-2.5 py-1 rounded-lg border border-purple-300 font-bold">0 / 30</span>
+                    </h3>
+
+                    <!-- Status Legend -->
+                    <div class="grid grid-cols-3 gap-1.5 mb-4 text-[11px] font-bold">
+                        <div class="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-lg border border-slate-300">
+                            <span class="w-3 h-3 rounded-full bg-slate-200 border border-slate-600 inline-block"></span>
+                            <span>Unanswered</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-lg border border-slate-300">
+                            <span class="w-3 h-3 rounded-full bg-emerald-500 border border-slate-900 inline-block"></span>
+                            <span>Answered</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-lg border border-slate-300">
+                            <span class="w-3 h-3 rounded-full bg-amber-400 border border-slate-900 inline-block"></span>
+                            <span>Review</span>
+                        </div>
+                    </div>
+
+                    <!-- Question Number Grid -->
+                    <div id="question-palette-grid" class="grid grid-cols-5 gap-2 max-h-72 overflow-y-auto custom-scrollbar p-1">
+                        <!-- Populated dynamically 1 to 30 -->
+                    </div>
+
+                    <!-- Direct Submit Button -->
+                    <div class="mt-5 pt-3 border-t-2 border-slate-200">
+                        <button onclick="confirmSubmitExam()" class="w-full py-3 bg-brand-orange hover:bg-orange-600 text-white font-extrabold text-sm border-2 border-slate-900 rounded-xl shadow-fun-sm transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span>Finish & Finish Exam</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- ================= SCREEN 3: RESULT SCREEN ================= -->
+        <div id="screen-result" class="hidden max-w-3xl mx-auto w-full bg-white border-4 border-slate-900 rounded-3xl p-6 md:p-8 shadow-fun-lg">
+            
+            <div class="text-center mb-6">
+                <div id="result-icon-container" class="w-20 h-20 mx-auto rounded-2xl bg-amber-100 border-4 border-slate-900 flex items-center justify-center text-4xl mb-3 shadow-fun">
+                    🏆
+                </div>
+                <h2 id="result-title" class="text-3xl font-black text-slate-800">Assessment Complete!</h2>
+                <p id="result-subtitle" class="text-sm font-semibold text-slate-600 mt-1">Great job completing your English assessment.</p>
+            </div>
+
+            <!-- Score Summary Cards Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                <div class="bg-purple-50 border-2 border-slate-900 rounded-2xl p-3 text-center shadow-fun-sm">
+                    <span class="text-[11px] font-black uppercase text-purple-700 block">Final Score</span>
+                    <span id="res-score" class="text-3xl font-black text-brand-purple">0</span>
+                    <span class="text-[10px] text-slate-500 font-bold block">/ 100</span>
+                </div>
+
+                <div class="bg-emerald-50 border-2 border-slate-900 rounded-2xl p-3 text-center shadow-fun-sm">
+                    <span class="text-[11px] font-black uppercase text-emerald-700 block">Correct Answers</span>
+                    <span id="res-correct" class="text-3xl font-black text-emerald-600">0</span>
+                    <span class="text-[10px] text-slate-500 font-bold block">questions</span>
+                </div>
+
+                <div class="bg-rose-50 border-2 border-slate-900 rounded-2xl p-3 text-center shadow-fun-sm">
+                    <span class="text-[11px] font-black uppercase text-rose-700 block">Wrong Answers</span>
+                    <span id="res-wrong" class="text-3xl font-black text-rose-600">0</span>
+                    <span class="text-[10px] text-slate-500 font-bold block">questions</span>
+                </div>
+
+                <div class="bg-amber-50 border-2 border-slate-900 rounded-2xl p-3 text-center shadow-fun-sm">
+                    <span class="text-[11px] font-black uppercase text-amber-700 block">Violations</span>
+                    <span id="res-violations" class="text-3xl font-black text-amber-600">0</span>
+                    <span class="text-[10px] text-slate-500 font-bold block">tab switches</span>
+                </div>
+            </div>
+
+            <!-- Student Info Summary Bar -->
+            <div class="bg-slate-100 border-2 border-slate-900 rounded-xl p-3 mb-6 flex flex-wrap items-center justify-between text-xs font-bold gap-2">
+                <div><i class="fa-solid fa-user text-brand-purple mr-1"></i> Student: <span id="res-student-name" class="text-slate-900">Name</span></div>
+                <div><i class="fa-solid fa-school text-brand-blue mr-1"></i> Class: <span id="res-student-class" class="text-slate-900">Class</span></div>
+                <div><i class="fa-solid fa-clock text-amber-600 mr-1"></i> Time Taken: <span id="res-time-taken" class="text-slate-900">0m 0s</span></div>
+            </div>
+
+            <!-- GAS Status Bar -->
+            <div id="gas-status-card" class="mb-6 p-3 rounded-xl border-2 border-slate-900 text-xs font-bold flex items-center justify-between bg-blue-50 text-blue-800">
+                <span class="flex items-center gap-2">
+                    <i id="gas-spinner" class="fa-solid fa-spinner fa-spin"></i>
+                    <span id="gas-status-text">Submitting results to Google Sheets...</span>
+                </span>
+                <button id="gas-retry-btn" onclick="submitResultsToGAS()" class="hidden px-2.5 py-1 bg-blue-600 text-white rounded-lg text-[11px] hover:bg-blue-700">Retry</button>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col md:flex-row gap-3">
+                <button onclick="toggleReviewMode()" class="flex-1 py-3 bg-brand-blue hover:bg-blue-600 text-white font-extrabold rounded-2xl border-2 border-slate-900 shadow-fun-sm transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-magnifying-glass font-black"></i>
+                    <span id="btn-review-text">Review Questions & Answers</span>
+                </button>
+                <button onclick="resetAppToStart()" class="py-3 px-6 bg-slate-800 hover:bg-slate-900 text-white font-extrabold rounded-2xl border-2 border-slate-900 shadow-fun-sm transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span>Back to Home</span>
+                </button>
+            </div>
+
+            <!-- Review Panel Section (Hidden by default) -->
+            <div id="review-panel" class="hidden mt-6 border-t-4 border-slate-900 pt-6 space-y-4">
+                <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-brand-purple"></i> Question-by-Question Review
+                </h3>
+                <div id="review-items-container" class="space-y-4 max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t-2 border-slate-900 py-3 text-center text-xs font-bold text-slate-500">
+        Grade 7 English Assessment Game • Kurikulum Merdeka (Fase D)
+    </footer>
+
+
+    <!-- ================= MODALS & POPUPS ================= -->
+    <!-- Cheating Warning Modal -->
+    <div id="modal-violation" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white border-4 border-slate-900 rounded-3xl p-6 max-w-md w-full shadow-fun-lg text-center animate-bounce-gentle">
+            <div class="w-16 h-16 mx-auto bg-red-100 border-4 border-slate-900 rounded-2xl flex items-center justify-center text-red-600 text-3xl mb-4 shadow-fun-sm">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 class="text-xl font-black text-red-600 uppercase">Warning: Cheating Detected!</h3>
+            <p class="text-sm font-medium text-slate-700 mt-2">
+                You switched tabs or left the assessment window. Leaving the assessment window is strictly forbidden!
+            </p>
+            <div class="my-4 p-3 bg-red-50 border-2 border-red-300 rounded-2xl">
+                <span class="text-xs font-extrabold text-red-700 block uppercase">Violation Counter</span>
+                <span id="modal-violation-count" class="text-2xl font-black text-red-600">1 / 3</span>
+            </div>
+            <p id="modal-violation-msg" class="text-xs text-slate-500 font-semibold mb-5">
+                Note: Reaching 3 violations will automatically invalidate your attempt and return to the main screen.
+            </p>
+            <button onclick="closeViolationModal()" class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-extrabold border-2 border-slate-900 rounded-xl shadow-fun-sm transition">
+                I Understand & Continue Test
+            </button>
+        </div>
+    </div>
+
+    <!-- Confirm Submit Modal -->
+    <div id="modal-confirm-submit" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white border-4 border-slate-900 rounded-3xl p-6 max-w-md w-full shadow-fun-lg text-center">
+            <div class="w-14 h-14 mx-auto bg-amber-100 border-4 border-slate-900 rounded-2xl flex items-center justify-center text-amber-600 text-2xl mb-3 shadow-fun-sm">
+                <i class="fa-solid fa-circle-question"></i>
+            </div>
+            <h3 class="text-xl font-black text-slate-800">Submit Assessment?</h3>
+            <p id="modal-confirm-text" class="text-xs md:text-sm text-slate-600 font-medium mt-2">
+                Are you sure you want to finish? Make sure you have reviewed all your answers.
+            </p>
+            <div class="flex gap-3 mt-5">
+                <button onclick="closeConfirmModal()" class="flex-1 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-extrabold border-2 border-slate-900 rounded-xl text-xs transition">
+                    Keep Working
+                </button>
+                <button onclick="executeFinalSubmit()" class="flex-1 py-2.5 bg-brand-green hover:bg-emerald-600 text-white font-extrabold border-2 border-slate-900 rounded-xl text-xs shadow-fun-sm transition">
+                    Yes, Submit Now
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teacher Guide & GAS Code Modal -->
+    <div id="modal-teacher" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white border-4 border-slate-900 rounded-3xl p-6 max-w-2xl w-full max-h-[85vh] flex flex-col shadow-fun-lg">
+            <div class="flex items-center justify-between border-b-2 border-slate-200 pb-3 mb-3">
+                <h3 class="font-black text-lg text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-file-code text-brand-purple"></i> Teacher Setup Guide: Google Apps Script
+                </h3>
+                <button onclick="closeTeacherModal()" class="text-slate-400 hover:text-slate-800 text-xl font-bold">&times;</button>
+            </div>
+
+            <div class="overflow-y-auto custom-scrollbar pr-2 space-y-4 text-xs text-slate-700 leading-relaxed flex-grow">
+                <div class="bg-amber-50 border border-amber-300 p-3 rounded-xl text-amber-800">
+                    <strong>Instructions:</strong>
+                    <ol class="list-decimal list-inside space-y-1 mt-1 font-medium">
+                        <li>Create a new <strong>Google Sheet</strong> in your Google Drive.</li>
+                        <li>Click <strong>Extensions &gt; Apps Script</strong>.</li>
+                        <li>Delete any existing code and paste the exact Google Apps Script code below into <code class="bg-amber-200 px-1 rounded">Code.gs</code>.</li>
+                        <li>Click <strong>Deploy &gt; New deployment</strong>.</li>
+                        <li>Select type: <strong>Web App</strong>. Set "Execute as": <strong>Me</strong>, and "Who has access": <strong>Anyone</strong>.</li>
+                        <li>Copy the generated <strong>Web App URL</strong> and paste it into the <code class="bg-amber-200 px-1 rounded">GAS_WEB_APP_URL</code> variable near line 25 of this HTML file!</li>
+                    </ol>
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-extrabold uppercase text-slate-800">Google Apps Script Code (.gs)</span>
+                        <button onclick="copyGasCode()" class="px-2 py-1 bg-slate-800 text-white rounded text-[10px] font-bold hover:bg-slate-700">
+                            <i class="fa-solid fa-copy mr-1"></i> Copy Code
+                        </button>
+                    </div>
+                    <pre id="gas-script-code" class="bg-slate-900 text-emerald-400 p-3 rounded-xl font-mono text-[11px] overflow-x-auto whitespace-pre">
+function doPost(e) {
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    
+    // Set up headers if empty
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow([
+        "Timestamp", 
+        "Nama", 
+        "Kelas", 
+        "Benar", 
+        "Salah", 
+        "Skor Akhir", 
+        "Jumlah Pelanggaran", 
+        "No Soal Salah"
+      ]);
+    }
+    
+    var data = JSON.parse(e.postData.contents);
+    
+    sheet.appendRow([
+      data.timestamp || new Date().toLocaleString(),
+      data.nama || "",
+      data.kelas || "",
+      data.benar || 0,
+      data.salah || 0,
+      data.skor || 0,
+      data.pelanggaran || 0,
+      data.noSoalSalah || "-"
+    ]);
+    
+    return ContentService.createTextOutput(JSON.stringify({"result": "success"}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({"result": "error", "error": err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+                    </pre>
+                </div>
+            </div>
+
+            <div class="pt-3 border-t-2 border-slate-200 text-right mt-3">
+                <button onclick="closeTeacherModal()" class="px-4 py-2 bg-slate-800 text-white font-extrabold rounded-xl text-xs">Close Guide</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= JAVASCRIPT APP ENGINE ================= -->
+    <script>
+        /* ================= QUESTION DATABASE (30 QUESTIONS) ================= */
+        /*
+         * Structure per question:
+         * id, level ('Easy'|'Medium'|'Hard'), topic, passage, prompt, imageUrl,
+         * options: [{ key, text, choiceImage }], answerKey ('A'|'B'|'C'|'D'), explanation
+         */
+        const QUESTIONS = [
+            // --- Easy / Medium: 1 - 10 (Favorite Food/Drinks, Asking/Providing Info, Likes & Dislikes) ---
+            {
+                id: 1,
+                level: "Easy",
+                topic: "Asking for Info",
+                passage: "Dialogue:\nMonita: What do you usually have for breakfast, Galang?\nGalang: I usually have fried rice and a glass of warm tea.\nMonita: Oh, that sounds delicious!",
+                prompt: "What does Galang usually drink for breakfast?",
+                imageUrl: "", // Add question image URL if needed
+                options: [
+                    { key: "A", text: "Cold milk", choiceImage: "" },
+                    { key: "B", text: "Warm tea", choiceImage: "" },
+                    { key: "C", text: "Orange juice", choiceImage: "" },
+                    { key: "D", text: "Iced coffee", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "Galang explicitly states: 'I usually have fried rice and a glass of warm tea.'"
+            },
+            {
+                id: 2,
+                level: "Easy",
+                topic: "Expressions of Likes",
+                passage: "Read the text:\nHi, I am Andre. I love eating snacks while studying. My absolute favorite snack is cassava chips because they are crunchy and lightly salted.",
+                prompt: "Why does Andre love cassava chips?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Because they are sweet and juicy.", choiceImage: "" },
+                    { key: "B", text: "Because they are crunchy and lightly salted.", choiceImage: "" },
+                    { key: "C", text: "Because they are soft and hot.", choiceImage: "" },
+                    { key: "D", text: "Because they are bitter and smooth.", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "The text states that cassava chips are his favorite because they are 'crunchy and lightly salted'."
+            },
+            {
+                id: 3,
+                level: "Easy",
+                topic: "Expressions of Dislikes",
+                passage: "Dialogue:\nPipit: Do you want some dark chocolate, Sinta?\nSinta: No, thank you. I dislike dark chocolate because it is too bitter for me. I prefer milk chocolate.",
+                prompt: "Which statement is CORRECT based on the dialogue?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Sinta loves dark chocolate.", choiceImage: "" },
+                    { key: "B", text: "Pipit dislikes dark chocolate.", choiceImage: "" },
+                    { key: "C", text: "Sinta dislikes dark chocolate because it is bitter.", choiceImage: "" },
+                    { key: "D", text: "Sinta prefers plain bitter cocoa.", choiceImage: "" }
+                ],
+                answerKey: "C",
+                explanation: "Sinta says she dislikes dark chocolate because it is too bitter and prefers milk chocolate."
+            },
+            {
+                id: 4,
+                level: "Medium",
+                topic: "Asking for Info",
+                passage: "Dialogue:\nTeacher: _____ do you like your ice cream, Made?\nMade: I like it with extra strawberry topping and chocolate sprinkles, ma'am!",
+                prompt: "Choose the correct expression to complete the teacher's question.",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Where", choiceImage: "" },
+                    { key: "B", text: "How", choiceImage: "" },
+                    { key: "C", text: "When", choiceImage: "" },
+                    { key: "D", text: "Who", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "'How do you like...' is the appropriate question to inquire about someone's preferred preparation/style of food."
+            },
+            {
+                id: 5,
+                level: "Easy",
+                topic: "Providing Info",
+                passage: "Read the short text:\nMonita's mother makes fresh iced lemonade every Sunday afternoon. Monita likes it very much because it is sour and refreshing.",
+                prompt: "How does the iced lemonade taste according to Monita?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Salty and greasy", choiceImage: "" },
+                    { key: "B", text: "Bitter and hot", choiceImage: "" },
+                    { key: "C", text: "Sour and refreshing", choiceImage: "" },
+                    { key: "D", text: "Savory and crunchy", choiceImage: "" }
+                ],
+                answerKey: "C",
+                explanation: "The text explicitly mentions that iced lemonade is 'sour and refreshing'."
+            },
+            {
+                id: 6,
+                level: "Medium",
+                topic: "Likes & Dislikes",
+                passage: "Dialogue:\nGalang: Is Bakso your favorite food?\nMonita: Yes, indeed! I ____ eating meatballs, especially with hot chili sauce.",
+                prompt: "Complete the sentence with the appropriate expression of preference.",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "hate", choiceImage: "" },
+                    { key: "B", text: "dislike", choiceImage: "" },
+                    { key: "C", text: "enjoy", choiceImage: "" },
+                    { key: "D", text: "cannot stand", choiceImage: "" }
+                ],
+                answerKey: "C",
+                explanation: "Since Monita confirmed 'Yes, indeed!' to Bakso being her favorite, 'enjoy' is the correct positive preference verb."
+            },
+            {
+                id: 7,
+                level: "Medium",
+                topic: "Providing Info",
+                passage: "Dialogue:\nMade: Do you prefer water or soda after playing soccer?\nRico: I prefer drinking fresh mineral water. Soda is too sweet and leaves a strange taste in my mouth.",
+                prompt: "What is Rico's opinion about soda?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "It is refreshing and healthy.", choiceImage: "" },
+                    { key: "B", text: "It is too sweet and leaves an odd taste.", choiceImage: "" },
+                    { key: "C", text: "It is not sweet enough.", choiceImage: "" },
+                    { key: "D", text: "It is his favorite drink after soccer.", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "Rico states soda is 'too sweet' and leaves a 'strange taste in my mouth'."
+            },
+            {
+                id: 8,
+                level: "Easy",
+                topic: "Asking for Info",
+                passage: "Dialogue:\nPipit: _____ is your favorite main dish for lunch?\nGalang: My favorite main dish is Ayam Goreng with sambal.",
+                prompt: "Fill in the blank with the correct question word.",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "What", choiceImage: "" },
+                    { key: "B", text: "Why", choiceImage: "" },
+                    { key: "C", text: "Where", choiceImage: "" },
+                    { key: "D", text: "Who", choiceImage: "" }
+                ],
+                answerKey: "A",
+                explanation: "'What' is used to ask for specific information about objects/things (favorite dish)."
+            },
+            {
+                id: 9,
+                level: "Medium",
+                topic: "Likes & Dislikes",
+                passage: "Statement:\n'My father dislikes spicy food, so he never adds sambal to his soup.'",
+                prompt: "What is the synonym of the word 'dislikes' in the text?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Adores", choiceImage: "" },
+                    { key: "B", text: "Does not like", choiceImage: "" },
+                    { key: "C", text: "Loves", choiceImage: "" },
+                    { key: "D", text: "Prefers", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "'Dislikes' means not liking something ('does not like')."
+            },
+            {
+                id: 10,
+                level: "Medium",
+                topic: "Providing Info",
+                passage: "Dialogue:\nSinta: How often do you drink Boba milk tea?\nAndre: Only once a month, because it contains too much sugar.",
+                prompt: "Why does Andre limit his Boba milk tea consumption?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Because it is very cheap.", choiceImage: "" },
+                    { key: "B", text: "Because he doesn't like milk.", choiceImage: "" },
+                    { key: "C", text: "Because it contains a high amount of sugar.", choiceImage: "" },
+                    { key: "D", text: "Because it is spicy.", choiceImage: "" }
+                ],
+                answerKey: "C",
+                explanation: "Andre explains he drinks it only once a month 'because it contains too much sugar'."
+            },
+
+            // --- Medium / Hard: 11 - 20 (Tastes & Textures) ---
+            {
+                id: 11,
+                level: "Medium",
+                topic: "Tastes & Textures",
+                passage: "Read the description:\n'Rendang is a famous traditional meat dish from West Sumatra. It tastes savory and spicy, and the meat texture is soft and tender after hours of cooking.'",
+                prompt: "What is the texture of the meat in well-cooked Rendang?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Crunchy and hard", choiceImage: "" },
+                    { key: "B", text: "Soft and tender", choiceImage: "" },
+                    { key: "C", text: "Crispy and dry", choiceImage: "" },
+                    { key: "D", text: "Smooth and watery", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "The text states 'the meat texture is soft and tender'."
+            },
+            {
+                id: 12,
+                level: "Medium",
+                topic: "Tastes & Textures",
+                passage: "Short Passage:\n'When Galang takes a bite of fresh green apples, he feels a sharp sour taste, but he loves how crunchy they feel in his mouth.'",
+                prompt: "Match the words with their category based on the passage:",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Sour = Taste, Crunchy = Texture", choiceImage: "" },
+                    { key: "B", text: "Sour = Texture, Crunchy = Taste", choiceImage: "" },
+                    { key: "C", text: "Sour = Color, Crunchy = Shape", choiceImage: "" },
+                    { key: "D", text: "Sour = Temperature, Crunchy = Taste", choiceImage: "" }
+                ],
+                answerKey: "A",
+                explanation: "'Sour' describes the taste profile, whereas 'crunchy' describes the texture/mouthfeel."
+            },
+            {
+                id: 13,
+                level: "Medium",
+                topic: "Tastes & Textures",
+                passage: "Read the list of foods:\n1. Honey pancakes\n2. Potato chips\n3. Black coffee without sugar\n4. Lemon juice",
+                prompt: "Which food/drink item is best described as 'BITTER'?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Honey pancakes", choiceImage: "" },
+                    { key: "B", text: "Potato chips", choiceImage: "" },
+                    { key: "C", text: "Black coffee without sugar", choiceImage: "" },
+                    { key: "D", text: "Lemon juice", choiceImage: "" }
+                ],
+                answerKey: "C",
+                explanation: "Black coffee without sugar is classic for its bitter taste profile."
+            },
+            {
+                id: 14,
+                level: "Medium",
+                topic: "Tastes & Textures",
+                passage: "Dialogue:\nGalang: Try this banana fritter (Pisang Goreng) while it's hot!\nMonita: Wow, the outer flour coating is so _____ and crispy, but the banana inside is soft and sweet!",
+                prompt: "Select the best word to describe the outer layer of a warm fried snack.",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "crunchy", choiceImage: "" },
+                    { key: "B", text: "chewy", choiceImage: "" },
+                    { key: "C", text: "greasy", choiceImage: "" },
+                    { key: "D", text: "bitter", choiceImage: "" }
+                ],
+                answerKey: "A",
+                explanation: "'Crunchy' pairs naturally with 'crispy' to describe fried batter or outer crusts."
+            },
+            {
+                id: 15,
+                level: "Medium",
+                topic: "Tastes & Textures",
+                passage: "Statement:\n'Boba pearls in bubble tea are very chewy, while puddings are smooth and soft.'",
+                prompt: "What does the adjective 'chewy' mean in this context?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Easy to break into powder", choiceImage: "" },
+                    { key: "B", text: "Requiring effort to chew before swallowing", choiceImage: "" },
+                    { key: "C", text: "Containing a lot of liquid", choiceImage: "" },
+                    { key: "D", text: "Having a rough and sharp surface", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "'Chewy' describes food that requires repeated biting/chewing due to elasticity."
+            },
+            {
+                id: 16,
+                level: "Medium",
+                topic: "Tastes & Textures",
+                passage: "Read the sentences:\n- Potato chips are salty and crispy.\n- Fried chicken skin is greasy and savory.\n- Chocolate cake is rich, sweet, and soft.",
+                prompt: "Which food item is described as 'greasy'?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Potato chips", choiceImage: "" },
+                    { key: "B", text: "Fried chicken skin", choiceImage: "" },
+                    { key: "C", text: "Chocolate cake", choiceImage: "" },
+                    { key: "D", text: "Plain white rice", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "The text states: 'Fried chicken skin is greasy and savory.'"
+            },
+            {
+                id: 17,
+                level: "Hard",
+                topic: "Tastes & Textures",
+                passage: "Dialogue:\nPipit: Ugh, I don't like this soup. It tastes like pure seawater!\nAndre: Oh, let me taste. Ah, you're right. The chef put too much salt in it.",
+                prompt: "What taste adjective describes Pipit's soup?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Salty", choiceImage: "" },
+                    { key: "B", text: "Savory", choiceImage: "" },
+                    { key: "C", text: "Sour", choiceImage: "" },
+                    { key: "D", text: "Sweet", choiceImage: "" }
+                ],
+                answerKey: "A",
+                explanation: "Tasting like seawater and having too much salt indicates an overly 'salty' taste."
+            },
+            {
+                id: 18,
+                level: "Medium",
+                topic: "Tastes & Textures",
+                passage: "Read the description:\n'Warm avocado smoothie with chocolate syrup has a creamy and thick texture. It tastes sweet and delightful.'",
+                prompt: "Which word describes the texture of the smoothie?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Creamy", choiceImage: "" },
+                    { key: "B", text: "Delightful", choiceImage: "" },
+                    { key: "C", text: "Sweet", choiceImage: "" },
+                    { key: "D", text: "Warm", choiceImage: "" }
+                ],
+                answerKey: "A",
+                explanation: "'Creamy' describes the texture (smooth/thick consistency), whereas sweet is a taste and warm is temperature."
+            },
+            {
+                id: 19,
+                level: "Hard",
+                topic: "Tastes & Textures",
+                passage: "Text snippet:\n'Kerupuk (Indonesian crackers) lose their crispy texture and become soggy if you leave the tin container open for too long.'",
+                prompt: "What is the opposite meaning (antonym) of 'crispy' in the text above?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Crunchy", choiceImage: "" },
+                    { key: "B", text: "Soggy", choiceImage: "" },
+                    { key: "C", text: "Savory", choiceImage: "" },
+                    { key: "D", text: "Hard", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "When kerupuk loses its crispiness due to moisture, it becomes 'soggy' (soft and wet), making soggy the opposite."
+            },
+            {
+                id: 20,
+                level: "Medium",
+                topic: "Tastes & Textures",
+                passage: "Context:\nMonita loves eating Gudeg from Yogyakarta. Gudeg is made from young jackfruit cooked with palm sugar and coconut milk. It is famously known for its _____ taste.",
+                prompt: "Which taste best fits Gudeg?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "spicy and sour", choiceImage: "" },
+                    { key: "B", text: "sweet and savory", choiceImage: "" },
+                    { key: "C", text: "bitter and salty", choiceImage: "" },
+                    { key: "D", text: "sour and plain", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "Gudeg cooked with palm sugar and coconut milk has a characteristic sweet and savory taste profile."
+            },
+
+            // --- Hard / HOTS: 21 - 30 (Descriptive Sentences, Adjective Order, Inference, Main Idea) ---
+            {
+                id: 21,
+                level: "Hard",
+                topic: "Descriptive Sentence / Adjectives",
+                passage: "Read the descriptive paragraph:\n'My grandmother makes special Klepon every Eid. Klepon is a traditional green palm sugar rice cake. When you bite into it, liquid warm palm sugar bursts in your mouth. It is sweet, soft, and covered in freshly grated coconut.'",
+                prompt: "What sensory detail is primarily highlighted in the paragraph?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Visual color and texture/taste explosion", choiceImage: "" },
+                    { key: "B", text: "Loud sound of crunching bones", choiceImage: "" },
+                    { key: "C", text: "Bitter aroma of burnt coffee", choiceImage: "" },
+                    { key: "D", text: "Cold icy feeling on fingers", choiceImage: "" }
+                ],
+                answerKey: "A",
+                explanation: "The text combines visual color ('green'), texture ('soft', 'grated coconut'), and taste ('sweet', 'bursts in your mouth')."
+            },
+            {
+                id: 22,
+                level: "Hard (HOTS)",
+                topic: "Adjective Order",
+                passage: "Grammar focus: Describing food with adjective order (Opinion + Size/Age + Color + Origin + Noun).",
+                prompt: "Choose the sentence with the CORRECT adjective word order:",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Galang bought a delicious big red Javanese apple.", choiceImage: "" },
+                    { key: "B", text: "Galang bought a red Javanese delicious big apple.", choiceImage: "" },
+                    { key: "C", text: "Galang bought a Javanese big delicious red apple.", choiceImage: "" },
+                    { key: "D", text: "Galang bought a big Javanese red delicious apple.", choiceImage: "" }
+                ],
+                answerKey: "A",
+                explanation: "Correct order: Opinion (delicious) -> Size (big) -> Color (red) -> Origin (Javanese) -> Noun (apple)."
+            },
+            {
+                id: 23,
+                level: "Hard (HOTS)",
+                topic: "Inference & Analysis",
+                passage: "Dialogue:\nMade: Hey Galang, do you want to share this hot spicy noodle bowl with me?\nGalang: No thanks, Made. My stomach gets upset whenever I eat hot chili dishes, especially during lunch time.\nMade: Oh, I see. I will order fried rice for you instead.",
+                prompt: "What can we INFER about Galang from the conversation?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Galang hates eating lunch with Made.", choiceImage: "" },
+                    { key: "B", text: "Galang cannot digest spicy food well.", choiceImage: "" },
+                    { key: "C", text: "Galang prefers spicy noodles over fried rice.", choiceImage: "" },
+                    { key: "D", text: "Galang is allergic to rice.", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "Galang states his stomach gets upset from hot chili dishes, so we infer he cannot digest spicy food well."
+            },
+            {
+                id: 24,
+                level: "Hard (HOTS)",
+                topic: "Main Idea",
+                passage: "Text Paragraph:\n'Es Cendol is a popular traditional Indonesian dessert drink. It consists of green rice flour jelly droplets, rich coconut milk, and liquid palm sugar syrup, served with crushed ice. People love drinking it on hot summer days because it is sweet, creamy, and chilled.'",
+                prompt: "What is the MAIN IDEA of the paragraph?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "How to make rice flour jelly droplets at home.", choiceImage: "" },
+                    { key: "B", text: "An overview of Es Cendol as a sweet, refreshing traditional dessert drink.", choiceImage: "" },
+                    { key: "C", text: "The health benefits of drinking palm sugar syrup.", choiceImage: "" },
+                    { key: "D", text: "Why coconut milk is dangerous for health.", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "The whole text introduces Es Cendol, its ingredients, and why people enjoy this sweet, refreshing traditional drink."
+            },
+            {
+                id: 25,
+                level: "Hard (HOTS)",
+                topic: "Contextual Dialogue",
+                passage: "Dialogue:\nMonita: 'Hmm, this Sambal Matah is super fragrant! It has fresh raw shallots, lemongrass, and lime juice.'\nPipit: 'Is it very hot?'\nMonita: 'A bit, but it tastes so spicy and fresh!'",
+                prompt: "Why does Sambal Matah have a fresh aroma according to Monita?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Because it is deep-fried in old palm oil.", choiceImage: "" },
+                    { key: "B", text: "Because it uses raw shallots, lemongrass, and lime juice.", choiceImage: "" },
+                    { key: "C", text: "Because it contains dark cocoa powder.", choiceImage: "" },
+                    { key: "D", text: "Because it is served boiling hot.", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "Monita attributes the fresh fragrant taste directly to the raw ingredients: shallots, lemongrass, and lime juice."
+            },
+            {
+                id: 26,
+                level: "Hard",
+                topic: "Descriptive Sentences",
+                passage: "Read the sentence:\n'The iced sweet orange juice is served in a tall clear glass with two ice cubes floating on top.'",
+                prompt: "Which words in the sentence function as ADJECTIVES describing the drink and container?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "iced, sweet, tall, clear", choiceImage: "" },
+                    { key: "B", text: "served, floating, orange, top", choiceImage: "" },
+                    { key: "C", text: "glass, juice, cubes, ice", choiceImage: "" },
+                    { key: "D", text: "in, with, on, two", choiceImage: "" }
+                ],
+                answerKey: "A",
+                explanation: "'Iced' and 'sweet' describe juice; 'tall' and 'clear' describe glass."
+            },
+            {
+                id: 27,
+                level: "Hard (HOTS)",
+                topic: "Analytical Comparison",
+                passage: "Text Comparison:\n'Soto Ayam is a warm savory yellow chicken soup served with light broth, vermicelli, and boiled eggs. On the other hand, Satay is grilled skewered meat served with thick, sweet, and nutty peanut sauce.'",
+                prompt: "How do Soto Ayam and Satay differ mainly in their texture and presentation?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Soto Ayam is dry, while Satay is watery.", choiceImage: "" },
+                    { key: "B", text: "Soto Ayam is a light warm soup, whereas Satay is skewered grilled meat with thick sauce.", choiceImage: "" },
+                    { key: "C", text: "Both dishes are cold desserts.", choiceImage: "" },
+                    { key: "D", text: "Satay is served in a bowl of broth, while Soto Ayam is grilled on charcoal.", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "Soto is described as a light warm chicken soup/broth; Satay is skewered grilled meat with thick peanut sauce."
+            },
+            {
+                id: 28,
+                level: "Hard (HOTS)",
+                topic: "Sentence Reconstruction",
+                passage: "Jumbled Words:\n[ favorite / my / is / spicy / snack / crunchy / chips / potato ]",
+                prompt: "Rearrange the words into a grammatically correct descriptive sentence:",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "My favorite snack is crunchy spicy potato chips.", choiceImage: "" },
+                    { key: "B", text: "Favorite my snack spicy potato crunchy is chips.", choiceImage: "" },
+                    { key: "C", text: "Potato chips crunchy spicy favorite my is snack.", choiceImage: "" },
+                    { key: "D", text: "My snack favorite crunchy potato is spicy chips.", choiceImage: "" }
+                ],
+                answerKey: "A",
+                explanation: "'My favorite snack is crunchy spicy potato chips' is the natural and grammatically correct English structure."
+            },
+            {
+                id: 29,
+                level: "Hard (HOTS)",
+                topic: "Contextual Inference",
+                passage: "Dialogue:\nTeacher: Class, why should we reduce consuming sweet soft drinks and instant noodles every day?\nSinta: Because soft drinks contain too much sugar which can hurt our teeth, and instant noodles contain high sodium and lack vitamins.",
+                prompt: "What conclusion can be drawn from Sinta's statement?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Soft drinks and instant noodles are healthy daily main meals.", choiceImage: "" },
+                    { key: "B", text: "Frequent consumption of soft drinks and instant noodles is bad for health.", choiceImage: "" },
+                    { key: "C", text: "Instant noodles provide all necessary vitamins for teenagers.", choiceImage: "" },
+                    { key: "D", text: "Sugar is good for keeping teeth strong and white.", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "Sinta outlines negative health consequences (tooth damage from sugar, high sodium, lack of vitamins), concluding they shouldn't be consumed daily."
+            },
+            {
+                id: 30,
+                level: "Hard (HOTS)",
+                topic: "Descriptive Text Synthesis",
+                passage: "Short Passage:\n'Rico loves visiting his aunt's bakery. The bakery always smells of fresh warm vanilla. His absolute favorite pastry is the croissant. It has a golden flaky crust on the outside and a butter-soft interior that melts in your mouth.'",
+                prompt: "Which pair of adjectives BEST summarizes the contrast between the outside and inside of the croissant?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Outside: Flaky/Golden | Inside: Butter-soft", choiceImage: "" },
+                    { key: "B", text: "Outside: Bitter | Inside: Spicy", choiceImage: "" },
+                    { key: "C", text: "Outside: Liquid | Inside: Hard", choiceImage: "" },
+                    { key: "D", text: "Outside: Sour | Inside: Salty", choiceImage: "" }
+                ],
+                answerKey: "A",
+                explanation: "The text explicitly describes 'golden flaky crust on the outside' and 'butter-soft interior'."
+            }
+        ];
+
+        /* ================= STATE MANAGEMENT ================= */
+        let currentState = {
+            studentName: "",
+            studentClass: "",
+            currentQuestionIndex: 0,
+            userAnswers: {},  // { questionId: 'A'|'B'|'C'|'D' }
+            doubtStatus: {},  // { questionId: true|false }
+            violationsCount: 0,
+            examStartTime: null,
+            examEndTime: null,
+            timerInterval: null,
+            remainingSeconds: 60 * 60, // 60 minutes
+            isExamActive: false,
+            reviewMode: false
+        };
+
+        /* ================= APPLICATION LIFECYCLE ================= */
+        window.addEventListener('DOMContentLoaded', () => {
+            setupAntiCheatingListeners();
+        });
+
+        // Toggle passcode input visibility
+        function togglePasscodeVisibility() {
+            const input = document.getElementById('input-passcode');
+            const icon = document.getElementById('passcode-eye-icon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        /* ================= LOGIN & EXAM START ================= */
+        function handleStartExam(event) {
+            event.preventDefault();
+            const nameInput = document.getElementById('input-student-name').value.trim();
+            const classInput = document.getElementById('input-student-class').value;
+            const passcode = document.getElementById('input-passcode').value.trim();
+            const errorMsg = document.getElementById('login-error-msg');
+
+            if (passcode !== SYSTEM_PASSCODE) {
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+            errorMsg.classList.add('hidden');
+
+            // Set state
+            currentState.studentName = nameInput;
+            currentState.studentClass = classInput;
+            currentState.currentQuestionIndex = 0;
+            currentState.userAnswers = {};
+            currentState.doubtStatus = {};
+            currentState.violationsCount = 0;
+            currentState.remainingSeconds = 60 * 60; // 60 min
+            currentState.isExamActive = true;
+            currentState.examStartTime = new Date();
+
+            // UI Switch
+            document.getElementById('screen-welcome').classList.add('hidden');
+            document.getElementById('screen-exam').classList.remove('hidden');
+            document.getElementById('header-status-bar').classList.remove('hidden');
+
+            // Render Palette & First Question
+            renderPaletteGrid();
+            renderQuestion(0);
+            startTimer();
+        }
+
+        /* ================= TIMER CONTROLLER ================= */
+        function startTimer() {
+            clearInterval(currentState.timerInterval);
+            updateTimerDisplay();
+
+            currentState.timerInterval = setInterval(() => {
+                if (!currentState.isExamActive) return;
+
+                currentState.remainingSeconds--;
+                updateTimerDisplay();
+
+                if (currentState.remainingSeconds <= 0) {
+                    clearInterval(currentState.timerInterval);
+                    alert("Time's up! Your assessment will be submitted automatically.");
+                    executeFinalSubmit();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const m = Math.floor(currentState.remainingSeconds / 60);
+            const s = currentState.remainingSeconds % 60;
+            const formatted = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            const displayEl = document.getElementById('timer-display');
+            displayEl.textContent = formatted;
+
+            // Warning visual if time < 5 minutes
+            if (currentState.remainingSeconds <= 300) {
+                displayEl.parentElement.parentElement.classList.add('pulse-red');
+            } else {
+                displayEl.parentElement.parentElement.classList.remove('pulse-red');
+            }
+        }
+
+        /* ================= QUESTION RENDERING ENGINE ================= */
+        function renderQuestion(index) {
+            currentState.currentQuestionIndex = index;
+            const q = QUESTIONS[index];
+
+            // Badge updates
+            document.getElementById('question-number-badge').textContent = `Q #${index + 1} / ${QUESTIONS.length}`;
+            
+            const levelBadge = document.getElementById('question-level-badge');
+            levelBadge.textContent = q.level;
+            if (q.level.includes("Easy")) {
+                levelBadge.className = "px-2.5 py-1 bg-emerald-100 text-emerald-800 border-2 border-emerald-800 font-bold rounded-xl text-xs";
+            } else if (q.level.includes("Medium")) {
+                levelBadge.className = "px-2.5 py-1 bg-amber-100 text-amber-800 border-2 border-amber-800 font-bold rounded-xl text-xs";
+            } else {
+                levelBadge.className = "px-2.5 py-1 bg-rose-100 text-rose-800 border-2 border-rose-800 font-bold rounded-xl text-xs";
+            }
+
+            document.getElementById('question-topic-badge').textContent = q.topic;
+
+            // Doubt toggle status
+            updateDoubtButtonUI(q.id);
+
+            // Passage
+            const passageBox = document.getElementById('passage-container');
+            if (q.passage && q.passage.trim() !== "") {
+                document.getElementById('passage-text').innerText = q.passage;
+                passageBox.classList.remove('hidden');
+            } else {
+                passageBox.classList.add('hidden');
+            }
+
+            // Image
+            const imgBox = document.getElementById('question-image-box');
+            const imgEl = document.getElementById('question-image');
+            if (q.imageUrl && q.imageUrl.trim() !== "") {
+                imgEl.src = q.imageUrl;
+                imgBox.classList.remove('hidden');
+            } else {
+                imgBox.classList.add('hidden');
+            }
+
+            // Question prompt
+            document.getElementById('question-prompt').textContent = q.prompt;
+
+            // Options
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            const selectedKey = currentState.userAnswers[q.id];
+
+            q.options.forEach(opt => {
+                const isSelected = (selectedKey === opt.key);
+                const optButton = document.createElement('button');
+                optButton.type = 'button';
+                optButton.onclick = () => selectOption(q.id, opt.key);
+
+                let btnStyle = "w-full text-left p-3.5 rounded-2xl border-2 font-semibold text-sm transition flex items-center justify-between gap-3 ";
+                if (isSelected) {
+                    btnStyle += "bg-purple-100 border-brand-purple text-brand-purple shadow-fun-sm font-extrabold";
+                } else {
+                    btnStyle += "bg-slate-50 border-slate-300 text-slate-700 hover:bg-slate-100 hover:border-slate-800";
+                }
+
+                optButton.className = btnStyle;
+
+                let optContent = `
+                    <div class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-xl border-2 ${isSelected ? 'bg-brand-purple text-white border-slate-900' : 'bg-white text-slate-700 border-slate-400'} flex items-center justify-center font-black text-xs shrink-0">
+                            ${opt.key}
+                        </span>
+                        <span class="leading-snug">${opt.text}</span>
+                    </div>
+                `;
+
+                if (opt.choiceImage && opt.choiceImage.trim() !== "") {
+                    optContent += `<img src="${opt.choiceImage}" alt="Choice image" class="h-10 w-10 object-cover rounded-lg border border-slate-400">`;
+                }
+
+                optButton.innerHTML = optContent;
+                optionsContainer.appendChild(optButton);
+            });
+
+            // Navigation Button Visibility
+            document.getElementById('btn-prev').disabled = (index === 0);
+            
+            if (index === QUESTIONS.length - 1) {
+                document.getElementById('btn-next').classList.add('hidden');
+                document.getElementById('btn-finish-exam').classList.remove('hidden');
+            } else {
+                document.getElementById('btn-next').classList.remove('hidden');
+                document.getElementById('btn-finish-exam').classList.add('hidden');
+            }
+
+            updatePaletteItemHighlight(index);
+        }
+
+        /* ================= OPTION SELECTION ================= */
+        function selectOption(qId, key) {
+            if (!currentState.isExamActive) return;
+
+            currentState.userAnswers[qId] = key;
+            renderQuestion(currentState.currentQuestionIndex);
+            renderPaletteGrid();
+        }
+
+        /* ================= DOUBT / REVIEW TOGGLE ================= */
+        function toggleDoubtState() {
+            const qId = QUESTIONS[currentState.currentQuestionIndex].id;
+            currentState.doubtStatus[qId] = !currentState.doubtStatus[qId];
+            updateDoubtButtonUI(qId);
+            renderPaletteGrid();
+        }
+
+        function updateDoubtButtonUI(qId) {
+            const isDoubt = !!currentState.doubtStatus[qId];
+            const btn = document.getElementById('btn-toggle-doubt');
+            const icon = document.getElementById('doubt-icon');
+            const text = document.getElementById('doubt-text');
+
+            if (isDoubt) {
+                btn.className = "px-3 py-1 bg-amber-400 text-slate-900 font-black border-2 border-slate-900 rounded-xl text-xs flex items-center gap-1.5 shadow-fun-sm";
+                icon.className = "fa-solid fa-bookmark text-slate-900";
+                text.textContent = "Marked for Review";
+            } else {
+                btn.className = "px-3 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold border-2 border-slate-900 rounded-xl text-xs flex items-center gap-1.5 transition";
+                icon.className = "fa-regular fa-bookmark text-amber-700";
+                text.textContent = "Mark for Review";
+            }
+        }
+
+        /* ================= QUESTION PALETTE GRID ================= */
+        function renderPaletteGrid() {
+            const grid = document.getElementById('question-palette-grid');
+            grid.innerHTML = '';
+
+            let answeredCount = 0;
+
+            QUESTIONS.forEach((q, idx) => {
+                const isAnswered = !!currentState.userAnswers[q.id];
+                const isDoubt = !!currentState.doubtStatus[q.id];
+                const isCurrent = (idx === currentState.currentQuestionIndex);
+
+                if (isAnswered) answeredCount++;
+
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.onclick = () => renderQuestion(idx);
+
+                let classes = "h-10 rounded-xl border-2 text-xs font-black transition flex items-center justify-center relative shadow-fun-sm ";
+
+                if (isCurrent) {
+                    classes += "ring-4 ring-purple-300 ring-offset-1 ";
+                }
+
+                if (isDoubt) {
+                    classes += "bg-amber-400 text-slate-900 border-slate-900";
+                } else if (isAnswered) {
+                    classes += "bg-emerald-500 text-white border-slate-900";
+                } else {
+                    classes += "bg-slate-100 text-slate-700 border-slate-300 hover:border-slate-800";
+                }
+
+                item.className = classes;
+                item.textContent = idx + 1;
+
+                grid.appendChild(item);
+            });
+
+            document.getElementById('answered-count-badge').textContent = `${answeredCount} / ${QUESTIONS.length}`;
+        }
+
+        function updatePaletteItemHighlight(activeIndex) {
+            const items = document.getElementById('question-palette-grid').children;
+            for (let i = 0; i < items.length; i++) {
+                if (i === activeIndex) {
+                    items[i].classList.add('ring-4', 'ring-purple-300', 'ring-offset-1');
+                } else {
+                    items[i].classList.remove('ring-4', 'ring-purple-300', 'ring-offset-1');
+                }
+            }
+        }
+
+        /* ================= NEXT / PREVIOUS NAVIGATION ================= */
+        function goToNextQuestion() {
+            if (currentState.currentQuestionIndex < QUESTIONS.length - 1) {
+                renderQuestion(currentState.currentQuestionIndex + 1);
+            }
+        }
+
+        function goToPrevQuestion() {
+            if (currentState.currentQuestionIndex > 0) {
+                renderQuestion(currentState.currentQuestionIndex - 1);
+            }
+        }
+
+        /* ================= PROCTORING & ANTI-CHEATING ENGINE ================= */
+        function setupAntiCheatingListeners() {
+            window.addEventListener('blur', handleUserCheatingViolation);
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    handleUserCheatingViolation();
+                }
+            });
+        }
+
+        function handleUserCheatingViolation() {
+            if (!currentState.isExamActive) return;
+
+            currentState.violationsCount++;
+            document.getElementById('header-violation-count').textContent = `${currentState.violationsCount} / 3`;
+            document.getElementById('modal-violation-count').textContent = `${currentState.violationsCount} / 3`;
+
+            if (currentState.violationsCount >= 3) {
+                // Max violations reached -> Reset session
+                alert("STRICT RULE VIOLATION: You left the exam window 3 times! Your assessment has been invalidated and reset.");
+                resetAppToStart();
+            } else {
+                // Show warning popup
+                document.getElementById('modal-violation').classList.remove('hidden');
+            }
+        }
+
+        function closeViolationModal() {
+            document.getElementById('modal-violation').classList.add('hidden');
+        }
+
+        /* ================= SUBMIT & RESULT LOGIC ================= */
+        function confirmSubmitExam() {
+            const unanswered = QUESTIONS.length - Object.keys(currentState.userAnswers).length;
+            const textEl = document.getElementById('modal-confirm-text');
+
+            if (unanswered > 0) {
+                textEl.innerHTML = `You still have <strong class="text-rose-600">${unanswered} unanswered question(s)</strong>. Are you sure you want to finish now?`;
+            } else {
+                textEl.innerHTML = `You have answered all 30 questions! Are you ready to submit your assessment?`;
+            }
+
+            document.getElementById('modal-confirm-submit').classList.remove('hidden');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('modal-confirm-submit').classList.add('hidden');
+        }
+
+        function executeFinalSubmit() {
+            closeConfirmModal();
+            currentState.isExamActive = false;
+            currentState.examEndTime = new Date();
+            clearInterval(currentState.timerInterval);
+
+            // Calculate Score
+            let correctCount = 0;
+            const wrongQuestionNumbers = [];
+
+            QUESTIONS.forEach((q, idx) => {
+                const userAns = currentState.userAnswers[q.id];
+                if (userAns === q.answerKey) {
+                    correctCount++;
+                } else {
+                    wrongQuestionNumbers.push(idx + 1);
+                }
+            });
+
+            const wrongCount = QUESTIONS.length - correctCount;
+            const finalScore = Math.round((correctCount / QUESTIONS.length) * 100);
+
+            // Calculate Time Taken
+            const diffMs = currentState.examEndTime - currentState.examStartTime;
+            const diffMin = Math.floor(diffMs / 60000);
+            const diffSec = Math.floor((diffMs % 60000) / 1000);
+            const timeTakenStr = `${diffMin}m ${diffSec}s`;
+
+            // UI Updates on Result Screen
+            document.getElementById('res-score').textContent = finalScore;
+            document.getElementById('res-correct').textContent = correctCount;
+            document.getElementById('res-wrong').textContent = wrongCount;
+            document.getElementById('res-violations').textContent = currentState.violationsCount;
+
+            document.getElementById('res-student-name').textContent = currentState.studentName;
+            document.getElementById('res-student-class').textContent = currentState.studentClass;
+            document.getElementById('res-time-taken').textContent = timeTakenStr;
+
+            // Result Title Dynamic Styling
+            const iconBox = document.getElementById('result-icon-container');
+            const titleEl = document.getElementById('result-title');
+            if (finalScore >= 80) {
+                iconBox.textContent = "🏆";
+                titleEl.textContent = "Outstanding Work!";
+            } else if (finalScore >= 60) {
+                iconBox.textContent = "🌟";
+                titleEl.textContent = "Good Effort!";
+            } else {
+                iconBox.textContent = "📚";
+                titleEl.textContent = "Keep Practicing!";
+            }
+
+            // Switch Screen
+            document.getElementById('screen-exam').classList.add('hidden');
+            document.getElementById('header-status-bar').classList.add('hidden');
+            document.getElementById('screen-result').classList.remove('hidden');
+
+            // Save summary references
+            currentState.summary = {
+                timestamp: new Date().toLocaleString(),
+                nama: currentState.studentName,
+                kelas: currentState.studentClass,
+                benar: correctCount,
+                salah: wrongCount,
+                skor: finalScore,
+                pelanggaran: currentState.violationsCount,
+                noSoalSalah: wrongQuestionNumbers.length > 0 ? wrongQuestionNumbers.join(', ') : "None"
+            };
+
+            // Post results to Google Apps Script
+            submitResultsToGAS();
+        }
+
+        /* ================= GAS HTTP POST INTEGRATION ================= */
+        function submitResultsToGAS() {
+            const statusCard = document.getElementById('gas-status-card');
+            const statusText = document.getElementById('gas-status-text');
+            const spinner = document.getElementById('gas-spinner');
+            const retryBtn = document.getElementById('gas-retry-btn');
+
+            if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.trim() === "") {
+                statusCard.className = "mb-6 p-3 rounded-xl border-2 border-amber-500 text-xs font-bold flex items-center justify-between bg-amber-50 text-amber-900";
+                spinner.className = "fa-solid fa-circle-info text-amber-600";
+                statusText.textContent = "Google Sheets sync is disabled (GAS_WEB_APP_URL not configured).";
+                retryBtn.classList.add('hidden');
+                return;
+            }
+
+            statusCard.className = "mb-6 p-3 rounded-xl border-2 border-slate-900 text-xs font-bold flex items-center justify-between bg-blue-50 text-blue-800";
+            spinner.className = "fa-solid fa-spinner fa-spin";
+            statusText.textContent = "Sending results to Google Sheets...";
+            retryBtn.classList.add('hidden');
+
+            // Send payload via fetch POST
+            fetch(GAS_WEB_APP_URL, {
+                method: 'POST',
+                mode: 'no-cors', // Standard cross-origin setting for GAS Web Apps
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(currentState.summary)
+            })
+            .then(() => {
+                statusCard.className = "mb-6 p-3 rounded-xl border-2 border-emerald-500 text-xs font-bold flex items-center justify-between bg-emerald-50 text-emerald-800";
+                spinner.className = "fa-solid fa-circle-check text-emerald-600";
+                statusText.textContent = "Successfully submitted score to Google Sheets!";
+                retryBtn.classList.add('hidden');
+            })
+            .catch(err => {
+                console.error("GAS Submission Error:", err);
+                statusCard.className = "mb-6 p-3 rounded-xl border-2 border-rose-500 text-xs font-bold flex items-center justify-between bg-rose-50 text-rose-800";
+                spinner.className = "fa-solid fa-circle-xmark text-rose-600";
+                statusText.textContent = "Failed to sync with Google Sheets.";
+                retryBtn.classList.remove('hidden');
+            });
+        }
+
+        /* ================= REVIEW MODE ENGINE ================= */
+        function toggleReviewMode() {
+            const panel = document.getElementById('review-panel');
+            const btnText = document.getElementById('btn-review-text');
+
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                btnText.textContent = "Hide Review Panel";
+                renderReviewItems();
+            } else {
+                panel.classList.add('hidden');
+                btnText.textContent = "Review Questions & Answers";
+            }
+        }
+
+        function renderReviewItems() {
+            const container = document.getElementById('review-items-container');
+            container.innerHTML = '';
+
+            QUESTIONS.forEach((q, idx) => {
+                const userAns = currentState.userAnswers[q.id] || "Unanswered";
+                const isCorrect = (userAns === q.answerKey);
+
+                const card = document.createElement('div');
+                card.className = `p-4 rounded-2xl border-2 text-xs font-medium space-y-2 ${isCorrect ? 'bg-emerald-50 border-emerald-400' : 'bg-rose-50 border-rose-400'}`;
+
+                let optionsListHtml = '';
+                q.options.forEach(opt => {
+                    let optClass = "p-2 rounded-lg border flex items-center justify-between ";
+                    if (opt.key === q.answerKey) {
+                        optClass += "bg-emerald-200 border-emerald-600 font-bold text-emerald-900";
+                    } else if (opt.key === userAns && !isCorrect) {
+                        optClass += "bg-rose-200 border-rose-600 font-bold text-rose-900";
+                    } else {
+                        optClass += "bg-white border-slate-200 text-slate-700";
+                    }
+
+                    optionsListHtml += `
+                        <div class="${optClass}">
+                            <span><strong>${opt.key}.</strong> ${opt.text}</span>
+                            ${opt.key === q.answerKey ? '<span class="text-[10px] bg-emerald-600 text-white px-2 py-0.5 rounded-full font-bold">Correct Key</span>' : ''}
+                            ${opt.key === userAns && !isCorrect ? '<span class="text-[10px] bg-rose-600 text-white px-2 py-0.5 rounded-full font-bold">Your Answer</span>' : ''}
+                        </div>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="font-black text-slate-900 text-sm">Question #${idx + 1} (${q.level})</span>
+                        <span class="px-2.5 py-0.5 rounded-full font-black text-[10px] uppercase ${isCorrect ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}">
+                            ${isCorrect ? 'Correct (+1)' : 'Incorrect (0)'}
+                        </span>
+                    </div>
+
+                    ${q.passage ? `<div class="bg-white/80 p-2 rounded-lg border border-slate-300 font-mono text-[11px] text-slate-700 whitespace-pre-line">${q.passage}</div>` : ''}
+
+                    <p class="font-bold text-slate-800">${q.prompt}</p>
+
+                    <div class="space-y-1 mt-2">
+                        ${optionsListHtml}
+                    </div>
+
+                    <div class="bg-white p-2.5 rounded-xl border border-slate-300 mt-2 text-slate-700">
+                        <strong class="text-brand-purple"><i class="fa-solid fa-lightbulb mr-1"></i> Explanation:</strong> ${q.explanation}
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        /* ================= RESET APP ================= */
+        function resetAppToStart() {
+            currentState.isExamActive = false;
+            clearInterval(currentState.timerInterval);
+            document.getElementById('modal-violation').classList.add('hidden');
+            document.getElementById('modal-confirm-submit').classList.add('hidden');
+            document.getElementById('screen-exam').classList.add('hidden');
+            document.getElementById('screen-result').classList.add('hidden');
+            document.getElementById('header-status-bar').classList.add('hidden');
+            document.getElementById('screen-welcome').classList.remove('hidden');
+            document.getElementById('login-form').reset();
+        }
+
+        /* ================= TEACHER MODAL ================= */
+        function openTeacherModal() {
+            document.getElementById('modal-teacher').classList.remove('hidden');
+        }
+
+        function closeTeacherModal() {
+            document.getElementById('modal-teacher').classList.add('hidden');
+        }
+
+        function copyGasCode() {
+            const codeText = document.getElementById('gas-script-code').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeText;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+            alert('Google Apps Script code copied to clipboard!');
+        }
+    </script>
+</body>
+</html>
